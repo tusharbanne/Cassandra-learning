@@ -1,0 +1,271 @@
+cassandra ------- to start the server
+
+cqlsh--------------to start the client
+
+create keyspace Dexter with replication={'class':'SimpleStrategy','replication_factor':1};
+
+
+cqlsh> describe keyspaces;
+
+
+cqlsh> describe keyspace first_keyspace;
+
+create keyspace first_keyspace with replication={'class':'SimpleStrategy','replication_factor':1};
+
+cqlsh> use first_keyspace;
+
+cqlsh:first_keyspace> create table employee(emp_id int,name text,designation text,primary key(emp_id));
+cqlsh:first_keyspace> describe table employee;
+
+cqlsh:first_keyspace> describe tables;
+
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1001,'Arvind','Developer');
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1002,'Deva','Accoutant');
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1003,'Subash','Accoutant');
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values(1004,'Raghu','Architect');
+cqlsh:first_keyspace> select * from employee;
+
+cqlsh:first_keyspace> select * from employee where emp_id=1001;
+
+cqlsh:first_keyspace> select emp_id,token(emp_id) from employee;
+
+cqlsh:first_keyspace> create table books_by_author(author_name text,publish_year int,book_id uuid, book_name text,rating float, primary key(author_name,publish_year,book_id));
+
+
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values ('Yashwant Kanetkar',1993,uuid(),'Understanding Pointers in C',4.7);
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values ('Yashwant Kanetkar',1993,uuid(),'Let us  C',4.6);
+    cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values ('Yashwant Kanetkar',1997,uuid(),'Exploring C',4.5);
+
+
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values ('Craig Walls',2012,uuid(),'Spring in Action 2.0',4.7);
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values ('Craig Walls',2017,uuid(),'Spring in Action 3.0',4.5);
+cqlsh:first_keyspace> insert into books_by_author(author_name,publish_year,book_id,book_name,rating) values ('Craig Walls',2019,uuid(),'Spring Boot in Action 3.0',4.3);
+cqlsh:first_keyspace> select * from books_by_author;
+
+cqlsh:first_keyspace> select * from books_by_author where author_name='Yashwant Kanetkar';
+
+cqlsh:first_keyspace> select * from books_by_author where publish_year=1993;
+
+
+
+cqlsh:first_keyspace> select * from books_by_author where publish_year=1993 allow filtering; // to be avoided in real time
+
+cqlsh:first_keyspace> update books_by_author set rating=4.6 where author_name='Craig Walls' and book_id=45142816-b645-4f76-8ff8-da4862c17bc4 and publish_year=2019;
+
+cqlsh:first_keyspace> delete from  books_by_author  where author_name='Craig Walls' and book_id=45142816-b645-4f76-8ff8-da4862c17bc4 and publish_year=2019;
+
+update books_by_author set rating=4.6 where author_name='Craig Walls' and book_id=45142816-b645-4f76-8ff8-da4862c17bc4 and publish_year=2019 if exists;
+
+cqlsh:first_keyspace> select * from employee;
+
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values (1004,'Arvind','Accountant');
+cqlsh:first_keyspace> select * from employee;
+
+cqlsh:first_keyspace> insert into employee(emp_id,name,designation) values (1004,'Surya','Architect') if not exists;
+
+cqlsh:first_keyspace> alter table books_by_author add emails set<text>;
+
+ update books_by_author set emails={'walls@gmail.com','craig@yahoo.com','craig@yahoo.com'} where author_name='Craig Walls' and book_id=fcede8aa-88a8-4566-9ee9-124251aa94b8 and publish_year=2019 if exists;
+ 
+ cqlsh:first_keyspace> alter table books_by_author add revised_years list<int>;
+ 
+ cqlsh:first_keyspace> update books_by_author set revised_years=[2020,2022,2022] where author_name='Craig Walls' and book_id=30533189-f2d3-4a0c-abac-4b845d82e1f6 and publish_year=2019 if exists;
+ 
+ cqlsh:first_keyspace> delete revised_years[1] from books_by_author where author_name='Craig Walls' and book_id=30533189-f2d3-4a0c-abac-4b845d82e1f6 and publish_year=2019;
+cqlsh:first_keyspace> select * from books_by_author;
+
+cqlsh:first_keyspace> update books_by_author set emails=emails-{'walls@gmail.com'} where author_name='Craig Walls' and book_id=30533189-f2d3-4a0c-abac-4b845d82e1f6 and publish_year=2019 if exists;
+
+
+cqlsh:first_keyspace> update books_by_author set revised_years=revised_years-[2020] where author_name='Craig Walls' and book_id=30533189-f2d3-4a0c-abac-4b845d82e1f6 and publish_year=2019 if exists;
+
+
+cqlsh:first_keyspace> alter table employee add family_members map<text,text>;
+
+cqlsh:first_keyspace> alter table employee add family_members map<text,text>;
+cqlsh:first_keyspace> update employee set family_members={'Wife':'Priya','Mother':'Indra'} where emp_id=1004;
+cqlsh:first_keyspace> select * from employee;
+
+cqlsh:first_keyspace> update employee set family_members=family_members+{'Son':'Rakesh'} where emp_id=1004;
+cqlsh:first_keyspace> select * from employee;
+
+qlsh:first_keyspace> update employee set family_members=family_members-{'Mother'} where emp_id=1004;
+cqlsh:first_keyspace> select * from employee;
+
+cqlsh:first_keyspace> create type address_type(door_no int,street text,location text,city text);
+
+cqlsh:first_keyspace> describe types;
+
+
+
+cqlsh:first_keyspace> describe type address_type;
+
+
+cqlsh:first_keyspace> create table customer(cust_id int,name text,resi_address address_type,primary key(cust_id));
+
+cqlsh:first_keyspace> insert into customer(cust_id,name,resi_address) values(144545,'Rajiv',{door_no:211,street:'G-10th street',location:'Hebbal',city:'Bangalore'});
+cqlsh:first_keyspace> select * from customer;
+
+cqlsh:first_keyspace> update customer set resi_address.location='KR Puram' where cust_id=144545;
+cqlsh:first_keyspace> select * from customer;
+
+cqlsh:first_keyspace> create table emp(emp_id int,name text,address frozen<address_type>,primary key(emp_id));
+
+cqlsh:first_keyspace> insert into emp(emp_id,name,address) values(5001,'Raghav',{door_no:124,street:'Tilak Street',location:'Bandra East',city:'Mumbai'});
+
+cqlsh:first_keyspace> update emp set address.door_no=432 where emp_id=5001;
+
+
+cqlsh:first_keyspace> update emp set address={door_no:432,street:'Tilak Street',location:'Bandra East',city:'Mumbai'} where emp_id=5001;
+
+cqlsh:first_keyspace> alter table books_by_author rename book_id to book_code;
+
+
+cqlsh:first_keyspace> create table test1(a int,b list<text>,primary key(a));
+
+cqlsh:first_keyspace> insert into test1(a,b) values(1,['aaa','bbb']);
+cqlsh:first_keyspace> select * from test1;
+
+
+cqlsh:first_keyspace> update test1 set b[1]='ccc' where a=1;
+cqlsh:first_keyspace> select * from test1;
+
+cqlsh:first_keyspace> create table test2(a int,b frozen<list<text>>,primary key(a));
+cqlsh:first_keyspace> insert into test2(a,b) values(1,['aaa','bbb']);
+cqlsh:first_keyspace> select * from test2;
+
+cqlsh:first_keyspace> update test2 set b[1]='ccc' where a=1;
+
+cqlsh:first_keyspace> update test2 set b=['aaa','ccc'] where a=1;
+cqlsh:first_keyspace> select * from test2;
+
+drop table users;
+cqlsh:first_keyspace> create table users(user_id int,name text,country text,primary key(user_id));
+
+
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1001,'David','UK');
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1002,'Surya','India');
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1003,'Rajiv','India');
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1004,'Teresa','US');
+cqlsh:first_keyspace> insert into users(user_id,name,country) values(1005,'Peter','UK');
+cqlsh:first_keyspace> select * from users;
+
+
+cqlsh:first_keyspace> select * from users where country='UK';
+
+cqlsh:first_keyspace> select * from users where country='UK' allow filtering;
+
+cqlsh:first_keyspace> create index country_idx on users(country);
+
+cqlsh:first_keyspace> select * from users where country='UK' ;
+
+cqlsh:first_keyspace> describe users;
+
+cqlsh:first_keyspace> alter table users add zipcodes set<int>;
+cqlsh:first_keyspace> create index zipcode_idx on users(zipcodes);
+cqlsh:first_keyspace> update users set zipcodes={322222,676761} where user_id=1004;
+cqlsh:first_keyspace> update users set zipcodes={522222,976761} where user_id=1005;
+cqlsh:first_keyspace> update users set zipcodes={522222,3323211} where user_id=1001;
+cqlsh:first_keyspace> update users set zipcodes={560001,200001} where user_id=1003;
+cqlsh:first_keyspace> update users set zipcodes={600001,300001} where user_id=1002;
+cqlsh:first_keyspace> select * from users;
+
+cqlsh:first_keyspace> select * from users where zipcodes contains 522222;
+
+https://dlcdn.apache.org//ant/binaries/apache-ant-1.9.16-bin.zip
+
+pip install ccm
+
+pip install psutil
+
+https://drive.google.com/drive/folders/1ACC1KIrw_9JfDh0rowgQhpGwJ_Zc1pLS?usp=sharing
+
+c:\windows\system32\Drivers\etc\hosts
+
+127.0.0.1       127.0.0.2
+127.0.0.1       127.0.0.3
+127.0.0.1       127.0.0.4
+
+
+Set-ExecutionPolicy Unrestricted
+
+ccm status
+
+ccm create mycluster -v 3.11.10
+
+https://drive.google.com/drive/folders/1ACC1KIrw_9JfDh0rowgQhpGwJ_Zc1pLS
+
+
+ccm populate -n 3
+
+ccm status
+
+ccm start
+
+ccm status
+
+set CQLSH_HOST=127.0.0.2
+
+cqlsh
+
+cqlsh> create keyspace sample_keyspace with replication={'class':'SimpleStrategy','replication_factor':2};
+
+cqlsh:sample_keyspace> create table customer(cust_id int,name text,balance double,primary key(cust_id));
+ use sample_keyspace;
+ 
+cqlsh:sample_keyspace> insert into customer(cust_id,name,balance) values(1001,'Rajesh',5000);
+cqlsh:sample_keyspace> insert into customer(cust_id,name,balance) values(1002,'Deva',3000);
+cqlsh:sample_keyspace> insert into customer(cust_id,name,balance) values(1003,'Rajiv',4000);
+cqlsh:sample_keyspace> insert into customer(cust_id,name,balance) values(1004,'Amar',8000);
+cqlsh:sample_keyspace> insert into customer(cust_id,name,balance) values(1005,'Surya',9000);
+
+
+nodetool -p 7100 getendpoints sample_keyspace customer 1001
+
+nodetool -p 7100 ring
+
+nodetool -p 7200 flush
+
+sstabledump C:\Users\Administrator\.ccm\mycluster\node2\data0\sample_keyspace\customer-5daca1f023cc11ef9b7fe589d0d3c730\md-1-big-Data.db
+
+
+
+
+cqlsh:sample_keyspace> delete from customer where cust_id=1005;
+cqlsh:sample_keyspace> insert into customer(cust_id,name,balance) values(1006,'Akash',9000);
+
+
+nodetool -p 7300 compact
+
+ccm node2 stop
+
+ccm status
+
+nodetool -p  7100 getendpoints sample_keyspace customer 1008
+
+C:\Users\Administrator>set CQLSH_HOST=127.0.0.1
+
+C:\Users\Administrator>cqlsh
+
+cqlsh> use sample_keyspace;
+cqlsh:sample_keyspace> insert into customer(cust_id,name,balance) values(1008,'Rajiv',9000);
+
+ccm node2 start
+
+ccm stop
+
+close all command windows 
+cassandra
+
+
+<dependencies>
+  <!-- https://mvnrepository.com/artifact/com.datastax.cassandra/cassandra-driver-core -->
+<dependency>
+    <groupId>com.datastax.cassandra</groupId>
+    <artifactId>cassandra-driver-core</artifactId>
+    <version>3.11.0</version>
+</dependency>
+  
+  </dependencies>
+  
+  
