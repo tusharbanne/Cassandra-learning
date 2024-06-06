@@ -267,5 +267,31 @@ cassandra
 </dependency>
   
   </dependencies>
-  
+
+
+import java.util.List;
+
+import com.datastax.driver.core.Cluster;
+import com.datastax.driver.core.ResultSet;
+import com.datastax.driver.core.Row;
+import com.datastax.driver.core.Session;
+
+public class SelectTest {
+
+    public static void main(String[] args) {
+        // TODO Auto-generated method stub
+        
+        Cluster cluster=Cluster.builder().addContactPoint("127.0.0.1").withPort(9042).build();
+        Session session=cluster.connect();//equivalent to opening a cqlsh prompt
+        String query="select emp_id,name,designation from first_keyspace.employee";
+        ResultSet rs=session.execute(query);
+        List<Row> list=rs.all();
+        list.forEach(row->{
+            System.out.println(row.getInt(0)+"\t"+row.getString(1)+"\t"+row.getString(2));
+        });
+        session.close();
+        cluster.close();
+    }
+
+}
   
